@@ -7,116 +7,354 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Night Out',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: .fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF00C5D7),
+          brightness: Brightness.dark,
+        ),
+        scaffoldBackgroundColor: const Color(0xFF07131A),
+        useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const EventPage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+class EventPage extends StatefulWidget {
+  const EventPage({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<EventPage> createState() => _EventPageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _EventPageState extends State<EventPage> {
+  bool _isFavorite = false;
+  String _selectedDrink = 'Cocktails';
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+  void _showMessage(String message) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildHero(),
+              const SizedBox(height: 18),
+              const Row(
+                children: [
+                  Expanded(child: _QuickStat(label: 'VIBE', value: 'Buzzing')),
+                  SizedBox(width: 12),
+                  Expanded(child: _QuickStat(label: 'UBER THERE', value: '5–6 min')),
+                ],
+              ),
+              const SizedBox(height: 14),
+              const Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  _Tag(icon: Icons.people_alt_outlined, label: 'No Line'),
+                  _Tag(icon: Icons.confirmation_number_outlined, label: 'Free Entry'),
+                ],
+              ),
+              const SizedBox(height: 16),
+              _buildHostCard(),
+              const SizedBox(height: 14),
+              _buildInfoCard(),
+              const SizedBox(height: 22),
+              const Text(
+                'Drink Menu',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 8,
+                children: ['Beer', 'Cocktails', 'Shots', 'Non-alcoholic']
+                    .map(
+                      (drink) => ChoiceChip(
+                        label: Text(drink),
+                        selected: _selectedDrink == drink,
+                        onSelected: (_) => setState(() => _selectedDrink = drink),
+                      ),
+                    )
+                    .toList(),
+              ),
+              const SizedBox(height: 14),
+              Text(
+                'Showing $_selectedDrink',
+                style: const TextStyle(color: Color(0xFF9BB1BC)),
+              ),
+              const SizedBox(height: 22),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () => _showMessage('Safe ride options are coming up.'),
+                  icon: const Icon(Icons.shield_outlined),
+                  label: const Text('Find a Safe Ride'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: const Color(0xFF21D889),
+                    side: const BorderSide(color: Color(0xFF21D889)),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: .center,
+    );
+  }
+
+  Widget _buildHero() {
+    return Container(
+      height: 240,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(18),
+        gradient: const LinearGradient(
+          colors: [Color(0xFF064A58), Color(0xFF102044), Color(0xFF101522)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: Stack(
+        children: [
+          const Positioned(
+            right: 22,
+            top: 48,
+            child: Icon(Icons.graphic_eq, size: 92, color: Color(0x5579E8EE)),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      tooltip: 'Go back',
+                      onPressed: () => _showMessage('Event details'),
+                      icon: const Icon(Icons.arrow_back),
+                    ),
+                    IconButton(
+                      tooltip: _isFavorite ? 'Remove favorite' : 'Add favorite',
+                      onPressed: () => setState(() => _isFavorite = !_isFavorite),
+                      icon: Icon(
+                        _isFavorite ? Icons.favorite : Icons.favorite_border,
+                        color: _isFavorite ? Colors.pinkAccent : Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+                const Spacer(),
+                const Wrap(
+                  spacing: 8,
+                  children: [
+                    _Tag(icon: Icons.star_border, label: 'Event Tonight'),
+                    _Tag(icon: Icons.local_bar_outlined, label: 'Happy Hour'),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  "Yesterday's",
+                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.w700),
+                ),
+                const SizedBox(height: 4),
+                const Text(
+                  'Five Points · 2030 Devine St, Columbia SC',
+                  style: TextStyle(color: Color(0xFFD2E5EB), fontSize: 13),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHostCard() {
+    return _Panel(
+      child: Column(
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.music_note, color: Color(0xFF00C5D7), size: 28),
+              const SizedBox(width: 12),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('DJ Smooth', style: TextStyle(fontWeight: FontWeight.bold)),
+                    SizedBox(height: 3),
+                    Text(
+                      'Top 40 / Hip-Hop · @djsmooth_cola',
+                      style: TextStyle(color: Color(0xFF9BB1BC), fontSize: 12),
+                    ),
+                  ],
+                ),
+              ),
+              const _Tag(icon: Icons.circle, label: 'LIVE'),
+            ],
+          ),
+          const Divider(height: 24),
+          const Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Set time', style: TextStyle(color: Color(0xFF9BB1BC))),
+              Text('10pm – 2am', style: TextStyle(fontWeight: FontWeight.w600)),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoCard() {
+    return const _Panel(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'INFO',
+                style: TextStyle(
+                  color: Color(0xFF9BB1BC),
+                  letterSpacing: 2,
+                  fontSize: 12,
+                ),
+              ),
+              Text('★★★★★  4.5', style: TextStyle(color: Color(0xFFFFA23A))),
+            ],
+          ),
+          SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(child: _InfoField(label: 'Hours', value: '11am – 2am')),
+              Expanded(child: _InfoField(label: 'Vibe', value: 'Classic Dive Bar')),
+            ],
+          ),
+          SizedBox(height: 14),
+          Row(
+            children: [
+              Expanded(child: _InfoField(label: 'Distance', value: '0.2 Mi Away')),
+              Expanded(child: _InfoField(label: 'Check-ins', value: '22 On BarCast')),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _Panel extends StatelessWidget {
+  const _Panel({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0xFF0C202A),
+        border: Border.all(color: const Color(0xFF174253)),
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: child,
+    );
+  }
+}
+
+class _QuickStat extends StatelessWidget {
+  const _QuickStat({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return _Panel(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(
+              color: Color(0xFF7895A3),
+              fontSize: 10,
+              letterSpacing: 1.5,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(value, style: const TextStyle(color: Color(0xFF00C5D7))),
+        ],
+      ),
+    );
+  }
+}
+
+class _Tag extends StatelessWidget {
+  const _Tag({required this.icon, required this.label});
+
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: const Color(0x3321D889),
+        border: Border.all(color: const Color(0x8821D889)),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('You have pushed the button this many times:'),
+            Icon(icon, size: 13, color: const Color(0xFF21D889)),
+            const SizedBox(width: 5),
             Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+              label,
+              style: const TextStyle(color: Color(0xFF21D889), fontSize: 11),
             ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ),
+    );
+  }
+}
+
+class _InfoField extends StatelessWidget {
+  const _InfoField({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: const TextStyle(color: Color(0xFF7895A3), fontSize: 11)),
+        const SizedBox(height: 5),
+        Text(value, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+      ],
     );
   }
 }
