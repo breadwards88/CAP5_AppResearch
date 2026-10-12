@@ -35,6 +35,12 @@ class EventPage extends StatefulWidget {
 class _EventPageState extends State<EventPage> {
   bool _isFavorite = false;
   String _selectedDrink = 'Cocktails';
+  final Map<String, List<String>> _drinksByCategory = {
+    'Beer': ['Light Lager', 'IPA', 'Draft Pilsner'],
+    'Cocktails': ['Margarita', 'Mojito', 'Old Fashioned'],
+    'Shots': ['Tequila', 'Lemon Drop', 'Green Tea'],
+    'Non-alcoholic': ['Lemonade', 'Soda', 'Mocktail of the Day'],
+  };
 
   void _showMessage(String message) {
     ScaffoldMessenger.of(context)
@@ -92,10 +98,8 @@ class _EventPageState extends State<EventPage> {
                     .toList(),
               ),
               const SizedBox(height: 14),
-              Text(
-                'Showing $_selectedDrink',
-                style: const TextStyle(color: Color(0xFF9BB1BC)),
-              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start, children: (_drinksByCategory[_selectedDrink] ?? []).map((drink) => ListTile(contentPadding: EdgeInsets.zero,title: Text(drink),)).toList(),),
               const SizedBox(height: 22),
               SizedBox(
                 width: double.infinity,
@@ -116,7 +120,6 @@ class _EventPageState extends State<EventPage> {
       ),
     );
   }
-
   Widget _buildHero() {
     return Container(
       height: 240,
@@ -168,12 +171,12 @@ class _EventPageState extends State<EventPage> {
                 ),
                 const SizedBox(height: 10),
                 const Text(
-                  "Yesterday's",
+                  "Art Bar's",
                   style: TextStyle(fontSize: 30, fontWeight: FontWeight.w700),
                 ),
                 const SizedBox(height: 4),
                 const Text(
-                  'Five Points · 2030 Devine St, Columbia SC',
+                  '1211 Park St, Columbia, SC 29201',
                   style: TextStyle(color: Color(0xFFD2E5EB), fontSize: 13),
                 ),
               ],
